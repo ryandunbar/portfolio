@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Viewer</title>
     <style>
+        /* Remove all margins, padding, and ensure the height covers the entire viewport */
         html, body {
             margin: 0;
             padding: 0;
@@ -12,13 +13,15 @@
             width: 100%;
             overflow: hidden;
         }
+
+        /* Ensure the iframe covers the full screen */
         iframe {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            border: none;
+            border: none; /* Remove any borders around the iframe */
         }
     </style>
 </head>
