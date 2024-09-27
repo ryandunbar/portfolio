@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryan Dunbar's Portfolio</title>
+    <title>PDF Viewer</title>
     <style>
         html, body {
             margin: 0;
@@ -11,7 +11,6 @@
             height: 100%;
             width: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: #f0f0f0;
@@ -19,78 +18,45 @@
         }
 
         #pdf-container {
+            height: 100%;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0 5%;
+            overflow-y: scroll;
+            background-color: #f0f0f0;
+            padding: 20px;
         }
 
-        #pdf-render {
+        canvas {
+            display: block;
+            margin: 0 auto 20px;
             border: 5px solid #181818;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            margin: 10px 0;
-        }
-
-        button {
-            padding: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            #pdf-render {
-                width: 100%;
-                height: auto;
-                border: none;
-            }
         }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button id="prev-page">Previous Page</button>
-        <span>Page: <span id="page-num"></span> / <span id="page-count"></span></span>
-        <button id="next-page">Next Page</button>
-    </div>
-
-    <div id="pdf-container">
-        <canvas id="pdf-render"></canvas>
-    </div>
+    <div id="pdf-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <script>
         const url = './Portfolio.pdf';
 
         let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
             scale = 1.5,
-            canvas = document.getElementById('pdf-render'),
-            ctx = canvas.getContext('2d');
+            canvasContainer = document.getElementById('pdf-container');
 
+        // Load the PDF document
         pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
             pdfDoc = pdfDoc_;
-            document.getElementById('page-count').textContent = pdfDoc.numPages;
-            renderPage(pageNum);
+            renderAllPages();
         });
 
-        function renderPage(num) {
-            pageRendering = true;
-            pdfDoc.getPage(num).then(page => {
+        function renderPage(pageNum) {
+            pdfDoc.getPage(pageNum).then(page => {
                 const viewport = page.getViewport({ scale: scale });
                 const outputScale = window.devicePixelRatio || 1;
 
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
                 canvas.height = viewport.height * outputScale;
                 canvas.width = viewport.width * outputScale;
 
@@ -104,40 +70,16 @@
                 };
 
                 page.render(renderContext).promise.then(() => {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
+                    canvasContainer.appendChild(canvas);
                 });
             });
-
-            document.getElementById('page-num').textContent = num;
         }
 
-        function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
+        function renderAllPages() {
+            for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                renderPage(pageNum);
             }
         }
-
-        document.getElementById('prev-page').addEventListener('click', () => {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            queueRenderPage(pageNum);
-        });
-
-        document.getElementById('next-page').addEventListener('click', () => {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            queueRenderPage(pageNum);
-        });
     </script>
 
 </body>
