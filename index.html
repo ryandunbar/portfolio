@@ -10,7 +10,6 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -21,15 +20,15 @@
 
         #pdf-container {
             width: 100%;
-            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 0 5%;
         }
 
         #pdf-render {
             border: 5px solid #181818;
-            max-width: 90%;
+            width: 100%;
             box-sizing: border-box;
         }
 
@@ -88,7 +87,6 @@
 
         function renderPage(num) {
             pageRendering = true;
-
             pdfDoc.getPage(num).then(page => {
                 const viewport = page.getViewport({ scale: scale });
                 const outputScale = window.devicePixelRatio || 1;
@@ -107,7 +105,6 @@
 
                 page.render(renderContext).promise.then(() => {
                     pageRendering = false;
-
                     if (pageNumPending !== null) {
                         renderPage(pageNumPending);
                         pageNumPending = null;
