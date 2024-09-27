@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryan Dunbar's Portfolio</title>
+    <title>PDF Viewer</title>
     <style>
         html, body {
             margin: 0;
@@ -15,12 +15,21 @@
 
         iframe {
             position: absolute;
-            top: 5%;
-            left: 5%;
+            top: 5vw;
+            left: 5vw;
             width: 90vw;
-            height: 90vh;
+            height: calc(100vh - 10vw);
             border: 5px solid #181818;
             box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+            iframe {
+                top: 5vh;
+                left: 5vw;
+                width: 90vw;
+                height: calc(100vh - 10vh);
+            }
         }
     </style>
 </head>
