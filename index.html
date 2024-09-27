@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Dunbar's Portfolio</title>
     <title>PDF Viewer</title>
     <style>
         html, body {
             margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-color: #181818;
             background-color: #f0f0f0;
             box-sizing: border-box;
         }
@@ -20,12 +17,10 @@
         #pdf-container {
             height: 100%;
             width: 100%;
-            max-width: 1800px;
             overflow-y: scroll;
+            background-color: #181818;
             background-color: #f0f0f0;
             padding: 20px;
-            border: 5px solid #181818;
-            box-sizing: border-box;
         }
 
         canvas {
@@ -34,22 +29,12 @@
             width: 100%;
             height: auto;
             border: 5px solid #181818;
-            box-sizing: border-box;
         }
     </style>
-</head>
-<body>
-
-    <div id="pdf-container"></div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <script>
-        const url = './Portfolio.pdf';
-
-        let pdfDoc = null,
             scale = 1.5,
             canvasContainer = document.getElementById('pdf-container');
 
+        // Load the PDF document
         pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
             pdfDoc = pdfDoc_;
             renderAllPages();
@@ -57,36 +42,34 @@
 
         function renderPage(pageNum) {
             pdfDoc.getPage(pageNum).then(page => {
+                const viewport = page.getViewport({ scale: scale });
+                const outputScale = window.devicePixelRatio || 1;
                 const viewport = page.getViewport({ scale: adjustScaleForDevice() });
 
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
+                canvas.height = viewport.height * outputScale;
+                canvas.width = viewport.width * outputScale;
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
+                canvas.style.height = `${viewport.height}px`;
+                canvas.style.width = `${viewport.width}px`;
                 canvas.style.width = '100%';
                 canvas.style.height = 'auto';
 
                 const renderContext = {
                     canvasContext: ctx,
                     viewport: viewport,
+                    transform: [outputScale, 0, 0, outputScale, 0, 0],
                 };
 
                 page.render(renderContext).promise.then(() => {
-                    canvasContainer.appendChild(canvas);
-                });
-            });
-        }
-
-        function renderAllPages() {
-            for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
                 renderPage(pageNum);
             }
         }
-
         function adjustScaleForDevice() {
             const screenWidth = window.innerWidth;
-
             if (screenWidth <= 768) {
                 return 1;
             }
@@ -95,4 +78,3 @@
     </script>
 
 </body>
-</html>
